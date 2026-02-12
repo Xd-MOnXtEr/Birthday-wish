@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday Sneha!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;400;500;600;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+      body {
+        font-family: 'Quicksand', sans-serif;
+        background: radial-gradient(circle at top right, #fff5f7, #ffffff, #fffafb);
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+      }
+      .font-romantic {
+        font-family: 'Dancing Script', cursive;
+      }
+      .font-elegant {
+        font-family: 'Great Vibes', cursive;
+      }
+      .font-serif-title {
+        font-family: 'Playfair Display', serif;
+      }
+      @keyframes float {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(2deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+      }
+      .animate-float {
+        animation: float 5s ease-in-out infinite;
+      }
+      .glass-morphism {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .photo-frame {
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,192,203,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      .photo-frame:hover {
+        transform: translateY(-8px) rotate(1deg);
+        box-shadow: 0 20px 40px -15px rgba(255,182,193,0.3);
+      }
+      
+      /* Sparkle Effect Styles */
+      .sparkle-particle {
+        position: fixed;
+        pointer-events: none;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 0 5px #fff, 0 0 10px #f472b6;
+        z-index: 9999;
+        animation: sparkle-fade 0.6s ease-out forwards;
+      }
+      @keyframes sparkle-fade {
+        0% { transform: scale(0) rotate(0deg); opacity: 1; }
+        100% { transform: scale(1.5) rotate(180deg); opacity: 0; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "canvas-confetti": "https://esm.sh/canvas-confetti@^1.9.3"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
