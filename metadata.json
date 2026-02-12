@@ -1,7 +1,5 @@
 {
   "name": "Sneha's Birthday Surprise",
-  "description": "A dynamic, romantic, and interactive birthday landing page created for Sneha with personalized AI-generated wishes, a memory gallery, and a virtual cake cutting experience.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+  "description": "A dynamic, romantic, and interactive birthday landing page created for Sneha with personalized static wishes, a memory gallery, and a virtual cake cutting experience.",
+  "requestFramePermissions": []
 }

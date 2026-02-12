@@ -9,29 +9,33 @@ const VirtualCake: React.FC = () => {
 
   const handleBlow = () => {
     setCakeState('BLOWN');
-    // Subtle confetti for blowing out
+    // Subtle sprinkle for blowing out
     confetti({
-      particleCount: 40,
-      spread: 50,
+      particleCount: 15,
+      spread: 40,
       origin: { y: 0.7 },
-      colors: ['#ffffff', '#fce7f3']
+      colors: ['#ffffff', '#fce7f3'],
+      scalar: 0.6,
+      gravity: 0.8
     });
   };
 
   const handleCut = () => {
     setCakeState('CUT');
-    // Big burst for cutting
+    // Gentle burst for cutting
     confetti({
-      particleCount: 150,
-      spread: 70,
+      particleCount: 50,
+      spread: 60,
       origin: { y: 0.8 },
-      colors: ['#ec4899', '#f43f5e', '#ffffff', '#fbbf24']
+      colors: ['#ec4899', '#f43f5e', '#ffffff'],
+      scalar: 0.5,
+      gravity: 0.7,
+      ticks: 100
     });
   };
 
   return (
     <div className="flex flex-col items-center justify-center p-12 bg-white/80 backdrop-blur-md rounded-[3rem] border border-pink-100 shadow-2xl mb-12 max-w-xl mx-auto relative overflow-hidden">
-      {/* Background Glow */}
       <div className={`absolute inset-0 bg-pink-200/10 transition-opacity duration-1000 ${cakeState === 'READY' ? 'opacity-100' : 'opacity-0'}`}></div>
 
       <h3 className="text-3xl font-romantic text-pink-600 mb-12 relative z-10">
@@ -41,27 +45,21 @@ const VirtualCake: React.FC = () => {
       </h3>
       
       <div className="relative py-12 scale-110">
-        {/* Knife Animation */}
         {cakeState === 'BLOWN' && (
           <div className="absolute -top-16 left-1/2 -translate-x-1/2 z-50 animate-bounce">
             <div className="text-5xl rotate-45">🔪</div>
           </div>
         )}
 
-        {/* Cake Structure */}
         <div className="relative">
-          {/* Main Cake */}
           <div className={`relative transition-all duration-700 ${cakeState === 'CUT' ? 'translate-x-4 rotate-2' : ''}`}>
-             {/* Cake Body */}
             <div className="w-56 h-36 bg-pink-100 rounded-t-[3rem] border-b-8 border-pink-200 relative shadow-2xl overflow-hidden group">
-              {/* Frosting Drip */}
               <div className="absolute top-0 left-0 w-full h-12 bg-pink-300/40 rounded-t-[3rem] flex justify-around items-end">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="w-8 h-10 bg-pink-300/40 rounded-b-full -mb-4"></div>
                 ))}
               </div>
               
-              {/* Sprinkles */}
               {[...Array(20)].map((_, i) => (
                 <div 
                   key={i} 
@@ -75,14 +73,12 @@ const VirtualCake: React.FC = () => {
                 ></div>
               ))}
 
-              {/* Cut Visual */}
               {cakeState === 'CUT' && (
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-pink-50/50 border-l-2 border-dashed border-pink-300"></div>
               )}
             </div>
           </div>
 
-          {/* Sliced Piece */}
           {cakeState === 'CUT' && (
             <div className="absolute top-0 left-0 w-56 h-36 animate__animated animate__slideOutLeft opacity-0">
                <div className="w-1/3 h-full bg-pink-100 rounded-tl-[3rem] border-r-4 border-pink-200"></div>
@@ -90,11 +86,9 @@ const VirtualCake: React.FC = () => {
           )}
         </div>
 
-        {/* Candles Container */}
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex gap-6 z-20">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="relative flex flex-col items-center">
-              {/* Smoke Effect */}
               {cakeState !== 'READY' && (
                 <div className="absolute -top-8 w-4 h-8 flex flex-col items-center">
                   <div className="w-1 h-4 bg-gray-300/40 rounded-full animate-[smoke_2s_ease-out_infinite]" style={{ animationDelay: `${i * 0.2}s` }}></div>
@@ -102,7 +96,6 @@ const VirtualCake: React.FC = () => {
                 </div>
               )}
 
-              {/* Flame */}
               {cakeState === 'READY' && (
                 <div className="absolute -top-6 w-5 h-8">
                   <div className="w-full h-full bg-orange-400 rounded-full animate-candle-flicker blur-[1px] relative">
@@ -111,7 +104,6 @@ const VirtualCake: React.FC = () => {
                 </div>
               )}
 
-              {/* Candle Stick */}
               <div className={`w-3 h-14 bg-gradient-to-b from-blue-200 to-blue-400 rounded-full shadow-md border-t border-blue-100 transition-all duration-500 ${cakeState === 'CUT' ? 'opacity-50' : ''}`}>
                  <div className="w-full h-1/2 border-b border-blue-300/30"></div>
               </div>
@@ -119,7 +111,6 @@ const VirtualCake: React.FC = () => {
           ))}
         </div>
         
-        {/* Plate */}
         <div className="w-72 h-8 bg-neutral-100 rounded-[100%] absolute -bottom-4 left-1/2 -translate-x-1/2 -z-10 shadow-lg border-b-4 border-neutral-200"></div>
       </div>
 

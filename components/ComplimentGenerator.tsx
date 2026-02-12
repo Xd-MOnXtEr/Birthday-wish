@@ -13,11 +13,14 @@ const ComplimentGenerator: React.FC = () => {
     setCompliment(text);
     setLoading(false);
     
+    // Very subtle sprinkle
     confetti({
-      particleCount: 25,
-      spread: 30,
+      particleCount: 8,
+      spread: 20,
       origin: { y: 0.8 },
-      colors: ['#fbcfe8', '#fce7f3', '#ffffff']
+      colors: ['#fbcfe8', '#ffffff'],
+      scalar: 0.4,
+      gravity: 0.5
     });
   };
 

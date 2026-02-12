@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -40,14 +39,15 @@
       }
       .photo-frame {
         box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,192,203,0.2);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        will-change: transform, box-shadow;
       }
       .photo-frame:hover {
-        transform: translateY(-8px) rotate(1deg);
-        box-shadow: 0 20px 40px -15px rgba(255,182,193,0.3);
+        transform: translateY(-12px) rotate(2deg) scale(1.04);
+        box-shadow: 0 30px 60px -12px rgba(244, 114, 182, 0.3);
+        z-index: 20;
       }
       
-      /* Sparkle Effect Styles */
       .sparkle-particle {
         position: fixed;
         pointer-events: none;
@@ -67,7 +67,6 @@
   "imports": {
     "react/": "https://esm.sh/react@^19.2.4/",
     "react": "https://esm.sh/react@^19.2.4",
-    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "canvas-confetti": "https://esm.sh/canvas-confetti@^1.9.3"
   }

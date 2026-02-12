@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useRef } from 'react';
 import { Photo } from '../types';
 import confetti from 'canvas-confetti';
 
@@ -8,20 +7,29 @@ interface PhotoGalleryProps {
 }
 
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
+  const lastConfettiTime = useRef<number>(0);
+
   const handlePhotoHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    const now = Date.now();
+    // Only trigger if at least 3 seconds have passed since the last one
+    if (now - lastConfettiTime.current < 3000) return;
+    
+    lastConfettiTime.current = now;
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (rect.left + rect.width / 2) / window.innerWidth;
     const y = (rect.top + rect.height / 2) / window.innerHeight;
 
     confetti({
-      particleCount: 12,
-      spread: 45,
+      particleCount: 4, // Very small amount
+      spread: 30,
       origin: { x, y },
-      colors: ['#f472b6', '#fb7185', '#fda4af', '#ffffff'],
-      ticks: 60,
-      gravity: 1.5,
-      scalar: 0.6, // Smaller, more delicate particles
-      shapes: ['circle']
+      colors: ['#f472b6', '#ffffff'],
+      ticks: 120, // Longer fade out
+      gravity: 0.6, // Slower fall
+      scalar: 0.4, // Much smaller particles
+      shapes: ['circle'],
+      zIndex: 40 // Ensure it stays behind the main navigation if needed
     });
   };
 
@@ -45,7 +53,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
                 <img 
                   src={photo.url} 
                   alt={photo.caption} 
-                  className="max-w-full max-h-full object-contain transition-transform duration-700 hover:scale-110" 
+                  className="max-w-full max-h-full object-contain transition-transform duration-700" 
                 />
               </div>
               <div className="pt-6 pb-2 px-2 text-center">

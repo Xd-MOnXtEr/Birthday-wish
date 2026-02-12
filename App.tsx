@@ -17,18 +17,49 @@ import MemoryScrapbook from './components/MemoryScrapbook';
 import MessageBottle from './components/MessageBottle';
 import LoveJar from './components/LoveJar';
 import ScratchCard from './components/ScratchCard';
+import HeartbeatRhythm from './components/HeartbeatRhythm';
+import InteractiveConstellation from './components/InteractiveConstellation';
 import confetti from 'canvas-confetti';
 
 const STORAGE_KEY = 'sneha_birthday_photos_v2';
-const AUDIO_URL = 'https://s31.aconvert.com/convert/p3r68-cdx67/u9g3e-y0rvb.mp3';
+const AUDIO_URL = 'https://image2url.com/r2/default/audio/1770921950890-76bea475-91d7-4270-bde1-4c32fdd69705.mp3';
+
+const ExpandableReason: React.FC<{ reason: string }> = ({ reason }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const firstSentenceMatch = reason.match(/^[^.!?]+[.!?]/);
+  const firstSentence = firstSentenceMatch ? firstSentenceMatch[0] : reason;
+  const restOfText = firstSentenceMatch ? reason.slice(firstSentenceMatch[0].length).trim() : "";
+
+  return (
+    <div className="glass-morphism p-10 rounded-[2.5rem] border border-white hover:border-pink-100 transition-all flex flex-col h-full">
+      <div className="flex-1">
+        <p className="text-gray-700 text-xl italic leading-relaxed">
+          "{isExpanded ? reason : firstSentence}"
+        </p>
+      </div>
+      {restOfText && (
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-6 text-pink-500 font-bold text-xs uppercase tracking-widest hover:text-pink-700 transition-colors flex items-center gap-2 group w-fit"
+        >
+          {isExpanded ? "Show Less" : "Read More"}
+          <span className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'group-hover:translate-y-1'}`}>
+            {isExpanded ? '↑' : '↓'}
+          </span>
+        </button>
+      )}
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>('LOCKED');
   const [wishes, setWishes] = useState<WishData | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -50,6 +81,13 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const scrollToId = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     const fetchWishes = async () => {
       setLoading(true);
@@ -60,15 +98,19 @@ const App: React.FC = () => {
     fetchWishes();
     loadDefaultPhotos();
 
-    // Initialize Audio
-    audioRef.current = new Audio(AUDIO_URL);
-    audioRef.current.loop = true;
+    // Setup background audio
+    const audio = new Audio(AUDIO_URL);
+    audio.loop = true;
+    audioRef.current = audio;
 
+    // Subtle initial hint of magic
     confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#f472b6', '#fb7185', '#fda4af']
+      particleCount: 20,
+      spread: 40,
+      origin: { y: 0.8 },
+      colors: ['#fbcfe8', '#ffffff'],
+      scalar: 0.5,
+      gravity: 0.7
     });
 
     return () => {
@@ -93,77 +135,101 @@ const App: React.FC = () => {
   const handleEnter = () => {
     setState('CELEBRATION');
     
-    // Play Background Music
+    // Play the audio
     if (audioRef.current) {
-      audioRef.current.play().catch(err => console.log("Audio play failed:", err));
-      setIsPlaying(true);
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(error => {
+        console.error("Audio playback failed:", error);
+      });
     }
-
-    const duration = 5 * 1000;
+    
+    const duration = 4 * 1000;
     const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const defaults = { startVelocity: 25, spread: 360, ticks: 120, zIndex: 0, scalar: 0.5, gravity: 0.6 };
     const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
     const interval: any = setInterval(function() {
       const timeLeft = animationEnd - Date.now();
       if (timeLeft <= 0) return clearInterval(interval);
-      confetti({ ...defaults, particleCount: 50, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-      confetti({ ...defaults, particleCount: 50, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-    }, 250);
+      confetti({ ...defaults, particleCount: 15, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+      confetti({ ...defaults, particleCount: 15, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 500);
     
     setTimeout(() => {
-      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      scrollToId('wishes-section');
     }, 1200);
   };
 
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
     }
   };
 
   const toggleMute = () => {
-    if (!audioRef.current) return;
-    audioRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
   };
 
   return (
     <div className="min-h-screen relative overflow-x-hidden selection:bg-pink-100 text-slate-800">
       <FloatingHearts />
 
-      {/* Music Controls */}
       {state !== 'LOCKED' && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-          <button 
-            onClick={toggleMusic}
-            className="w-12 h-12 bg-white/80 backdrop-blur shadow-lg rounded-full flex items-center justify-center text-pink-500 border border-pink-100 hover:scale-110 transition-transform"
-          >
-            {isPlaying ? '⏸️' : '▶️'}
-          </button>
-          <button 
-            onClick={toggleMute}
-            className="w-12 h-12 bg-white/80 backdrop-blur shadow-lg rounded-full flex items-center justify-center text-pink-500 border border-pink-100 hover:scale-110 transition-transform"
-          >
-            {isMuted ? '🔇' : '🔊'}
-          </button>
-        </div>
+        <>
+          <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] glass-morphism px-8 py-3 rounded-full border border-pink-100 shadow-2xl flex items-center gap-6 animate__animated animate__fadeInDown">
+            {[
+              { id: 'reasons-section', label: 'Reasons' },
+              { id: 'story-section', label: 'Story' },
+              { id: 'pulse-section', label: 'Pulse' },
+              { id: 'gallery-section', label: 'Memories' },
+              { id: 'cake-section', label: 'Cake' }
+            ].map((link) => (
+              <button 
+                key={link.id}
+                onClick={() => scrollToId(link.id)}
+                className="text-[10px] uppercase tracking-widest font-bold text-pink-400 hover:text-pink-600 transition-colors"
+              >
+                {link.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Floating Audio Controls */}
+          <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-2 animate__animated animate__fadeInUp">
+            <button 
+              onClick={toggleMute}
+              className="w-10 h-10 glass-morphism rounded-full flex items-center justify-center text-pink-500 border border-pink-100 shadow-lg hover:scale-110 transition-transform"
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+            <button 
+              onClick={togglePlay}
+              className="w-12 h-12 glass-morphism rounded-full flex items-center justify-center text-pink-500 border border-pink-100 shadow-lg hover:scale-110 transition-transform"
+            >
+              {isPlaying ? '⏸' : '▶️'}
+            </button>
+          </div>
+        </>
       )}
       
-      <section className={`h-screen flex flex-col items-center justify-center px-4 transition-all duration-1000 ${state !== 'LOCKED' ? 'opacity-0 scale-110 pointer-events-none absolute' : 'opacity-100 scale-100'}`}>
+      <section id="top" className={`h-screen flex flex-col items-center justify-center px-4 transition-all duration-1000 ${state !== 'LOCKED' ? 'opacity-0 scale-110 pointer-events-none absolute' : 'opacity-100 scale-100'}`}>
         <div className="text-center space-y-10 max-w-2xl animate__animated animate__fadeIn">
           <div className="space-y-4">
-            <h2 className="text-pink-400 text-xs font-bold tracking-[0.5em] uppercase animate__animated animate__fadeInDown">A Tribute to Purity</h2>
+            <h2 className="text-pink-400 text-xs font-bold tracking-[0.5em] uppercase animate__animated animate__fadeInDown">A Lifetime in a Moment</h2>
             <h1 className="text-8xl md:text-9xl font-elegant text-pink-600 drop-shadow-2xl hover:scale-105 transition-transform cursor-default">Sneha</h1>
           </div>
           <div className="glass-morphism p-8 rounded-3xl border border-white/40 shadow-2xl relative group">
             <p className="text-gray-700 italic text-xl leading-relaxed font-light">
-              "For the girl whose soul is as pure as a prayer, whose sanskari values are her greatest ornament."
+              "Meeting you was like finding a song I had known the words to all my life, but had never heard the music."
             </p>
           </div>
           <button 
@@ -178,7 +244,7 @@ const App: React.FC = () => {
 
       {state !== 'LOCKED' && (
         <main className="relative z-10">
-          <section className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+          <section id="wishes-section" className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
             <h1 onMouseMove={handleSparkleHover} className="text-6xl md:text-8xl font-romantic text-pink-600 leading-tight mb-8">
               Happy Birthday, <br/><span className="italic text-rose-400">Sneha!</span>
             </h1>
@@ -191,59 +257,68 @@ const App: React.FC = () => {
           </section>
 
           <AgeClock />
-          
           <SoulmateStats />
-
           <ComplimentGenerator />
-
           <LoveJar />
 
-          <section className="py-16 px-6 bg-pink-50/20">
-            <div className="max-w-5xl mx-auto text-center mb-12">
+          <section id="reasons-section" className="py-24 px-6 bg-pink-50/20 scroll-mt-24">
+            <div className="max-w-5xl mx-auto text-center mb-16">
                <h2 className="text-5xl font-romantic text-pink-600">Why You Are My One</h2>
+               <div className="h-1 w-16 bg-pink-200 mx-auto mt-4 rounded-full"></div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
               {wishes?.reasons.map((reason, idx) => (
-                <div key={idx} className="glass-morphism p-10 rounded-[2.5rem] border border-white hover:-translate-y-2 transition-transform">
-                  <p className="text-gray-700 text-xl italic">"{reason}"</p>
-                </div>
+                <ExpandableReason key={idx} reason={reason} />
               ))}
             </div>
           </section>
 
-          <LoveStory />
+          <section id="story-section" className="scroll-mt-24">
+            <LoveStory />
+          </section>
 
           <FlowerGarden />
-
           <MemoryScrapbook />
 
-          <PhotoGallery photos={photos} />
+          <section id="pulse-section" className="scroll-mt-24 py-12">
+            <HeartbeatRhythm />
+            <InteractiveConstellation />
+          </section>
+
+          <section id="gallery-section" className="scroll-mt-24">
+            <PhotoGallery photos={photos} />
+          </section>
 
           <FutureDreams />
-
+          {/* Fix: use correct casing for ScratchCard component */}
           <ScratchCard />
-
           <MessageBottle />
-
           <MysteryGift />
 
           <section className="py-24 px-6 bg-pink-50/10">
             <div className="glass-morphism p-12 md:p-20 rounded-[4rem] shadow-2xl max-w-4xl mx-auto text-center relative border border-white">
               <h2 className="text-4xl font-romantic text-pink-600 mb-8">A Letter of Love</h2>
               <div className="space-y-6 text-xl text-slate-700 italic leading-loose">
-                <p>"You are my anchor, my peace, and my most cherished blessing. Happy Birthday to the girl who is far more beautiful on the inside than she could ever be on the outside."</p>
+                <p>"In a world of temporary things, you are a feeling that lasts forever. You aren't just the love of my life; you are the life of my love. Happy Birthday to the girl who makes my soul feel like it finally found its way home."</p>
               </div>
             </div>
           </section>
 
-          <VirtualCake />
+          <section id="cake-section" className="scroll-mt-24">
+            <VirtualCake />
+          </section>
 
           <footer className="py-40 text-center relative">
             <div className="max-w-2xl mx-auto space-y-8">
               <div className="text-7xl animate-float inline-block">💝</div>
               <h3 className="text-5xl font-romantic text-pink-600">Always Yours.</h3>
               <p className="text-gray-400 text-xs font-bold tracking-[0.6em] uppercase">Sneha • 13.02.2026</p>
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="mt-8 px-8 py-3 rounded-full border border-pink-200 text-pink-400 hover:bg-pink-500 hover:text-white transition-all text-xs uppercase font-bold tracking-widest">Relive the Magic</button>
+              <button 
+                onClick={() => scrollToId('top')} 
+                className="mt-8 px-8 py-3 rounded-full border border-pink-200 text-pink-400 hover:bg-pink-500 hover:text-white transition-all text-xs uppercase font-bold tracking-widest"
+              >
+                Relive the Magic
+              </button>
             </div>
           </footer>
         </main>

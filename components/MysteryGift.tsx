@@ -21,11 +21,15 @@ const MysteryGift: React.FC = () => {
       setIsOpen(true);
       setLoading(false);
       
+      // Elegant sprinkle for the big reveal
       confetti({
-        particleCount: 150,
-        spread: 100,
+        particleCount: 40,
+        spread: 80,
         origin: { y: 0.6 },
-        colors: ['#fbbf24', '#f59e0b', '#ffffff']
+        colors: ['#fbbf24', '#ffffff'],
+        scalar: 0.6,
+        gravity: 0.6,
+        ticks: 150
       });
     }
   };
@@ -43,7 +47,6 @@ const MysteryGift: React.FC = () => {
             onClick={handleTap}
             className={`relative w-40 h-40 cursor-pointer transition-all duration-300 transform ${taps > 0 ? 'scale-110' : ''} ${taps > 1 ? 'animate-bounce' : ''}`}
           >
-            {/* 3D-ish CSS Box */}
             <div className={`absolute inset-0 bg-pink-500 rounded-xl shadow-2xl border-4 border-pink-400 flex items-center justify-center transition-transform ${taps === 1 ? 'rotate-3' : ''} ${taps === 2 ? '-rotate-3' : ''}`}>
                <div className="w-full h-8 bg-yellow-400 absolute top-1/2 -translate-y-1/2"></div>
                <div className="h-full w-8 bg-yellow-400 absolute left-1/2 -translate-x-1/2"></div>

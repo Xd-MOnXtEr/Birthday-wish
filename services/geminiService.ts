@@ -1,179 +1,91 @@
 
-import { GoogleGenAI, Type, GenerateContentParameters } from "@google/genai";
 import { WishData } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 /**
- * Helper to handle API calls with exponential backoff and caching
+ * Static service providing heartfelt content for Sneha's Birthday
+ * No API key required.
  */
-async function safeGenerate(
-  cacheKey: string,
-  config: GenerateContentParameters,
-  fallback: any,
-  isJson: boolean = false
-): Promise<any> {
-  // Check session cache first to save quota
-  const cached = sessionStorage.getItem(cacheKey);
-  if (cached) {
-    return isJson ? JSON.parse(cached) : cached;
-  }
 
-  let retries = 0;
-  const maxRetries = 3;
-  const baseDelay = 2000; // 2 seconds
-
-  while (retries <= maxRetries) {
-    try {
-      const response = await ai.models.generateContent(config);
-      const text = response.text?.trim();
-
-      if (!text) throw new Error("Empty response");
-
-      const result = isJson ? JSON.parse(text) : text;
-      
-      // Cache the successful result
-      sessionStorage.setItem(cacheKey, isJson ? JSON.stringify(result) : result);
-      return result;
-    } catch (error: any) {
-      const isRateLimit = error?.message?.includes("429") || error?.status === 429;
-      
-      if (isRateLimit && retries < maxRetries) {
-        const delay = baseDelay * Math.pow(2, retries);
-        console.warn(`Rate limit hit. Retrying in ${delay}ms... (Attempt ${retries + 1})`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-        retries++;
-        continue;
-      }
-
-      console.error(`Gemini API Error for ${cacheKey}:`, error);
-      break; 
-    }
-  }
-
-  return fallback;
-}
+const getRandomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 export const generateSnehaWishes = async (name: string): Promise<WishData> => {
-  const fallback = {
-    poem: "Phalguna winds and a heart of gold,\nA story of purity yet to be told.\nWith sanskari grace and eyes so true,\nMy world finds its meaning only in you.",
+  // Simulate network delay for effect
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  return {
+    poem: "Beyond the stars and quiet night,\nYou are my heart's enduring light.\nIn every breath and word I say,\nI love you more with every day.",
     reasons: [
-      "Your quiet purity finds joy in the simplest things.",
-      "Your 'sanskari' heart treats every soul with respect.",
-      "There is a sacred kind of innocence in your eyes.",
-      "You are so naturally cute without even trying.",
-      "You are my conscience and my greatest blessing."
+      "The way your presence feels like a quiet sanctuary from the world.",
+      "Your 'sanskari' grace—that rare, beautiful integrity you carry with such ease.",
+      "How you understand the unspoken language of my heart perfectly.",
+      "The way your eyes hold a universe of kindness I could get lost in forever.",
+      "Your unwavering belief in us, even when the road gets steep."
     ],
-    message: "Sneha, you are the most beautiful reality I have ever known. Happy Birthday!"
+    message: `${name}, you are the most beautiful poetry I have ever read. Happy Birthday!`
   };
-
-  return safeGenerate(
-    `wishes_${name}`,
-    {
-      model: 'gemini-3-pro-preview',
-      contents: `Write a birthday tribute for ${name}.`,
-      config: {
-        systemInstruction: `You are a deeply romantic person writing a birthday tribute for your girlfriend, ${name}, who is turning a year older on February 13th. Capture her 'sanskari' nature, pure soul, and adorable charm.`,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            poem: { type: Type.STRING },
-            reasons: { type: Type.ARRAY, items: { type: Type.STRING } },
-            message: { type: Type.STRING }
-          },
-          required: ["poem", "reasons", "message"]
-        }
-      }
-    },
-    fallback,
-    true
-  );
 };
+
+const compliments = [
+  "You are the peace my heart has been searching for its entire life.",
+  "Your smile is the only light I need to find my way through the dark.",
+  "In a world of noise, you are my favorite melody.",
+  "Your kindness is a masterpiece that the world deserves to see.",
+  "Being with you feels like a Sunday morning that never ends.",
+  "You carry a grace that makes even the stars look dim.",
+  "My favorite place in the whole world is wherever you are standing.",
+  "You don't just have a beautiful face; you have a soul that glows."
+];
 
 export const generateCompliment = async (name: string): Promise<string> => {
-  return safeGenerate(
-    `compliment_${Math.floor(Math.random() * 10)}`, // Randomize key slightly for varied compliments but cache per session
-    {
-      model: 'gemini-3-flash-preview',
-      contents: `Write a single, unique, extremely soulful one-line compliment for a girl named ${name}.`,
-      config: {
-        systemInstruction: `Focus on her "pure soul", "sanskari nature", or "rare innocence". One sentence only.`
-      }
-    },
-    "Your soul is a rare melody of purity in a noisy world."
-  );
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return getRandomItem(compliments);
 };
 
+const goldenBlessings = [
+  "May your life be a masterpiece of joy, painted with the colors of the love we share.",
+  "May your path be lined with the same kindness you give so freely to the world.",
+  "I wish for your soul to always dance in the light of absolute peace and purpose.",
+  "May every dream you hold close to your heart find its way to reality this year.",
+  "May the universe reward your pure heart with infinite moments of wonder."
+];
+
 export const generateGoldenWish = async (name: string): Promise<string> => {
-  return safeGenerate(
-    `golden_wish_${name}`,
-    {
-      model: 'gemini-3-flash-preview',
-      contents: `Write a "Golden Blessing" for ${name} on her birthday.`,
-      config: {
-        systemInstruction: `Write a deeply moving blessing (3-4 sentences) for her future. Mention her goodness returning a thousandfold.`
-      }
-    },
-    "May the universe mirror the purity of your heart, surrounding you with a peace as infinite as your kindness. Your goodness is a seed that will bloom into a thousand joys."
-  );
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  return getRandomItem(goldenBlessings);
 };
 
 export const generateNameMeaning = async (): Promise<string> => {
-  return safeGenerate(
-    `name_meaning_sneha`,
-    {
-      model: 'gemini-3-flash-preview',
-      contents: `Explain the spiritual and romantic depth of the name "Sneha".`,
-      config: {
-        systemInstruction: `Focus on affection, smoothness, and eternal bonding.`
-      }
-    },
-    "Sneha means affection that flows like sacred oil, soothing the world with its pure and gentle warmth."
-  );
+  return "Sneha translates to a profound, flowing affection. It is the kind of love that saturates the soul with warmth and pure grace.";
 };
+
+const bottleMessages = [
+  "In a vast ocean of faces, I would find you again in every lifetime. You are my destiny.",
+  "Our love is a message that time could never erase, floating towards a forever we build together.",
+  "The stars were aligned the moment we met; everything since has been a beautiful unfolding.",
+  "To the world, you are one person, but to me, you are the entire world."
+];
 
 export const generateBottleMessage = async (): Promise<string> => {
-  return safeGenerate(
-    `bottle_message_sneha`,
-    {
-      model: 'gemini-3-flash-preview',
-      contents: `Write a secret message found in a bottle for Sneha.`,
-      config: {
-        systemInstruction: `A prophecy about her being a gift to humanity because of her pure 'sanskari' soul.`
-      }
-    },
-    "Across the tides of time, you were sent to remind the world that purity still exists. You are a living prayer."
-  );
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return getRandomItem(bottleMessages);
 };
 
+const jarNotes = [
+  "Thank you for being my constant in a world of variables.",
+  "You are the best thing that ever happened to me.",
+  "Your love is my favorite adventure.",
+  "I am so proud of the woman you are becoming.",
+  "Every day with you is my new favorite day.",
+  "You are my home, my heart, and my forever.",
+  "Your laugh is the sound of my happiness.",
+  "I love you more than words could ever capture."
+];
+
 export const generateJarNote = async (): Promise<string> => {
-  // We use a timestamp-based key occasionally to allow new notes, 
-  // but let's cache at least 5 variants to reduce quota hit
-  const noteId = Math.floor(Math.random() * 5);
-  return safeGenerate(
-    `jar_note_${noteId}`,
-    {
-      model: 'gemini-3-flash-preview',
-      contents: `Write a short, heart-melting note (max 15 words) for a "Jar of Love".`,
-      config: {
-        systemInstruction: `Topic: Why Sneha is irreplaceable. Tone: Soulful and intimate.`
-      }
-    },
-    "Your innocence is the quiet rhythm that keeps my world in harmony."
-  );
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return getRandomItem(jarNotes);
 };
 
 export const generateScratchMessage = async (): Promise<string> => {
-  return safeGenerate(
-    `scratch_message_sneha`,
-    {
-      model: 'gemini-3-flash-preview',
-      contents: `Write a secret "Grand Prize" message for a birthday scratch card for Sneha.`,
-      config: {
-        systemInstruction: `A romantic promise for the future. 1-2 sentences.`
-      }
-    },
-    "You've won a lifetime of my undivided love and a thousand more sunsets together."
-  );
+  return "You've won a future filled with my absolute devotion and infinite love.";
 };
